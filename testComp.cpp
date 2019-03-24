@@ -12,7 +12,7 @@ using namespace std;
 using namespace cs221util;
 
 
-TEST_CASE("stats::basic rectArea","[weight=1][part=stats]"){
+/*TEST_CASE("stats::basic rectArea","[weight=1][part=stats]"){
 
     PNG data; data.resize(2,2);
 
@@ -23,7 +23,7 @@ TEST_CASE("stats::basic rectArea","[weight=1][part=stats]"){
 
     REQUIRE(result == 4);
     
-}
+}*/
 
 TEST_CASE("stats::basic getAvg","[weight=1][part=stats]"){
     PNG data; data.resize(2,2);
@@ -44,7 +44,7 @@ TEST_CASE("stats::basic getAvg","[weight=1][part=stats]"){
 
     REQUIRE(result == expected);
 }
-
+/*
 TEST_CASE("stats::basic entropy","[weight=1][part=stats]"){
     PNG data; data.resize(2,2);
     for (int i = 0; i < 2; i ++){
@@ -62,9 +62,9 @@ TEST_CASE("stats::basic entropy","[weight=1][part=stats]"){
     long result = s.entropy(ul,lr);
 
     REQUIRE(result == 2);
-}
+}*/
 
-TEST_CASE("toqutree::basic ctor render","[weight=1][part=toqutree]"){
+/*TEST_CASE("toqutree::basic ctor render","[weight=1][part=toqutree]"){
     PNG img;
     img.readFromFile("images/stanleySquare.png");
 
@@ -101,5 +101,5 @@ TEST_CASE("toqutree::basic prune","[weight=1][part=toqutree]"){
     result.convert();
 
     REQUIRE(expected==result);
-}
+}*/
 
