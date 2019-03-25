@@ -31,13 +31,9 @@ stats::stats(PNG & im){
 				for(unsigned int j=0; j<=y; j++){
 					HSLAPixel *pixel = im.getPixel(i,j);
 					sumS+=pixel->s;
-					sumL+=pixel->h;
-					if(i==x){
-						sumHY+=pixel->h;
-					}
-					if(j==y){
-						sumHX+=pixel->h;
-					}
+					sumL+=pixel->l;
+					sumHX+=pixel->s * cos(pixel->h);
+					sumHY+=pixel->s * sin(pixel->h);
 
 					for(int k=0; k<36; k++){
 						if(pixel->h >= (10*k) && pixel->h < (10*k+10)){
@@ -76,18 +72,40 @@ HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 	cout<< sumSat[ul.first][ul.second]<<endl;
 	cout<< sumSat[lr.first][ul.second]<<endl;
 	cout<< sumSat[ul.first][lr.second]<<endl;
-	double sumS = sumSat[lr.first][lr.second] + sumSat[ul.first][ul.second] - sumSat[ul.first][lr.second] - sumSat[lr.first][ul.second];
-	average.s = sumS/count;
+	double sumS;
+	double sumL;
+	double sumHX;
+	double sumHY;
+	if(ul.first>0 && ul.second>0){
+		sumS = sumSat[lr.first][lr.second] + sumSat[ul.first-1][ul.second-1] - sumSat[ul.first-1][lr.second] - sumSat[lr.first][ul.second-1];
+		sumL = sumLum[lr.first][lr.second] + sumLum[ul.first-1][ul.second-1] - sumLum[ul.first-1][lr.second] - sumLum[lr.first][ul.second-1];
+		sumHX = sumHueX[lr.first][lr.second] + sumHueX[ul.first-1][ul.second-1] - sumHueX[ul.first-1][lr.second] - sumHueX[lr.first][ul.second-1];
+		sumHY = sumHueY[lr.first][lr.second] + sumHueY[ul.first-1][ul.second-1] - sumHueY[ul.first-1][lr.second] - sumHueY[lr.first][ul.second-1];
+	}
+	else if(ul.second > 0){
+		sumS = sumSat[lr.first][lr.second] - sumSat[lr.first][ul.second-1];
+		sumL = sumLum[lr.first][lr.second] - sumLum[lr.first][ul.second-1];
+		sumHX = sumHueX[lr.first][lr.second] - sumHueX[lr.first][ul.second-1];
+		sumHY = sumHueY[lr.first][lr.second] - sumHueY[lr.first][ul.second-1];
+	}
+	else if(ul.first > 0){
+		sumS = sumSat[lr.first][lr.second] - sumSat[ul.first-1][lr.second];
+		sumL = sumLum[lr.first][lr.second] - sumLum[ul.first-1][lr.second];
+		sumHX = sumHueX[lr.first][lr.second] - sumHueX[ul.first-1][lr.second];
+		sumHY = sumHueY[lr.first][lr.second] - sumHueY[ul.first-1][lr.second];
+	}
+	else{
+		sumS = sumSat[lr.first][lr.second];
+		sumL = sumSat[lr.first][lr.second];
+		sumHX = sumHueX[lr.first][lr.second];
+		sumHY = sumHueY[lr.first][lr.second];
+	}
 
-	double sumL = sumLum[lr.first][lr.second] + sumLum[ul.first][ul.second] - sumLum[ul.first][lr.second] - sumLum[lr.first][ul.second];
+	average.s = sumS/count;
 	average.l = sumL/count;
 
-	double sumHX = sumHueX[lr.first][lr.second] + sumHueX[ul.first][ul.second] - sumHueX[ul.first][lr.second] - sumHueX[lr.first][ul.second];
 	double X = sumHX/count;
-
-	double sumHY = sumHueY[lr.first][lr.second] + sumHueY[ul.first][ul.second] - sumHueY[ul.first][lr.second] - sumHueY[lr.first][ul.second];
 	double Y = sumHY/count;
-
 	average.h = atan2(X,Y)*180/PI;
 
 	average.a = 1.0;
