@@ -87,12 +87,14 @@ else{
 					HSLAPixel *pixel = im.getPixel(i,j);
 					sumS+=pixel->s;
 					sumL+=pixel->l;
-					cout<<"pixel h:"<<pixel->h<<endl;
+					//cout<<"pixel h:"<<pixel->h<<endl;
 					sumHX+=pixel->s * cos((pixel->h)*PI/180);
 					sumHY+=pixel->s * sin((pixel->h)*PI/180);
 
 					for(int k=0; k<36; k++){
 						if(pixel->h >= (10*k) && pixel->h < (10*k+10)){
+/*							cout<<"should count"<<endl;
+							cout<<"k:"<<k<<endl;*/
 							hist[x][y][k]++;
 						}
 					}					
@@ -103,9 +105,13 @@ else{
 			sumHueY[x][y] = sumHY;
 			sumSat[x][y] = sumS;
 			sumLum[x][y] = sumL;
+
 		}
 
 	}
+/*		for(int k=0; k<36; k++){
+			cout<<"first array:"<<"k: "<<k<<"   "<<hist[1][1][k]<<endl;
+		}*/
 
 
 }
@@ -161,13 +167,6 @@ HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 
 	double X = sumHX/count;
 	double Y = sumHY/count;
-	cout<<"sum"<<endl;
-	cout<<sumHX<<endl;
-	cout<<sumHY<<endl;
-
-	cout<<X<<endl;
-	cout<<Y<<endl;
-
 
 	average.h = atan2(Y,X)*180/PI;
 
@@ -181,8 +180,23 @@ vector<int> stats::buildHist(pair<int,int> ul, pair<int,int> lr){
 /* your code here */
 	vector<int> newHist(36);
 	for(int k=0; k<36; k++){
-		newHist[k] = hist[ul.first][ul.second][k] + hist[lr.first][lr.second][k] - hist[ul.first][lr.second][k] - hist[lr.first][ul.second][k];
+		if(ul.first>0 && ul.second>0){
+			newHist[k] = hist[lr.first][lr.second][k] + hist[ul.first-1][ul.second-1][k] - hist[ul.first-1][lr.second][k] - hist[lr.first][ul.second-1][k];
+		}
+		else if(ul.second > 0){
+			newHist[k] = hist[lr.first][lr.second][k] - hist[lr.first][ul.second-1][k];
+		}
+		else if(ul.first > 0){
+			newHist[k] = hist[lr.first][lr.second][k] - hist[ul.first-1][lr.second][k];
+		}
+		else{
+			newHist[k] = hist[lr.first][lr.second][k];
+		}
 	}
+
+/*	for(int k=0; k<36; k++){
+		cout<<"k: "<<k<<"   "<<newHist[k]<<endl;
+	}*/
 	return newHist;
 }
 
