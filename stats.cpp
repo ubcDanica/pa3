@@ -4,46 +4,101 @@
 stats::stats(PNG & im){
 
 /* your code here */
-	sumHueX.reserve(im.width());
-	sumHueY.reserve(im.width());
-	sumSat.reserve(im.width());
-	sumLum.reserve(im.width());
+	sumHueX.resize(im.width());
+	sumHueY.resize(im.width());
+	sumSat.resize(im.width());
+	sumLum.resize(im.width());
 
-	hist.reserve(im.width());
+	hist.resize(im.width());
+	cout<<"width:"<<im.width()<<endl;
+	cout<<"height:"<<im.height()<<endl;
 
 	for(unsigned int x=0; x<im.width(); x++){
-		sumHueX[x].reserve(im.height());
-		sumHueY[x].reserve(im.height());
-		sumSat[x].reserve(im.height());
-		sumLum[x].reserve(im.height());
+		//cout<<"x:"<<x<<endl;
+		sumHueX[x].resize(im.height());
+		sumHueY[x].resize(im.height());
+		sumSat[x].resize(im.height());
+		sumLum[x].resize(im.height());
 
-		hist[x].reserve(im.height());
+		hist[x].resize(im.height());
 
 		for(unsigned int y=0; y<im.height(); y++){
+			//cout<<"y:"<<y<<endl;
 			double sumHX = 0;
 			double sumHY = 0;
 			double sumS = 0;
 			double sumL = 0;
 
-			hist[x][y].reserve(36);
+
+			hist[x][y].resize(36);
+/*			HSLAPixel *pixel = im.getPixel(x,y);
+
+
+if(x>0 && y >0){
+   sumHueX[x][y] = sumHueX[x-1][y] + sumHueX[x][y-1] + pixel->s * cos((pixel->h)*PI/180) - sumHueX[x-1][y-1];
+   sumHueY[x][y] = sumHueY[x-1][y] + sumHueY[x][y-1] + pixel->s * sin((pixel->h)*PI/180) - sumHueY[x-1][y-1];
+   sumSat[x][y] = sumSat[x-1][y] + sumSat[x][y-1]+ pixel->s - sumSat[x-1][y-1];
+   sumLum[x][y] = sumLum[x-1][y] + sumLum[x][y-1] +pixel->l - sumLum[x-1][y-1];
+   for(int k = 0; k<35; k++){
+      if(pixel->h >= (10 * k) && (pixel->h < (10 * k + 10))){
+         hist[x][y][k] = hist[x-1][y][k] + hist[x][y-1][k] - hist[x-1][y-1][k] + 1;
+      }
+   }
+}
+else if(x>0 && y==0){
+   sumHueX[x][y] = sumHueX[x-1][y] + pixel->s * cos((pixel->h)*PI/180);
+   sumHueY[x][y] = sumHueY[x-1][y] + pixel->s * sin((pixel->h)*PI/180);
+   sumSat[x][y] = sumSat[x-1][y] + pixel->s;
+   sumLum[x][y] = sumSat[x-1][y] + pixel->l;
+   for(int k = 0; k<35; k++){
+      if(pixel->h >= (10 * k) && (pixel->h < (10 * k + 10))){
+         hist[x][y][k] = hist[x-1][y][k] + 1;
+      }
+   }
+
+}
+else if (y>0 && x==0){
+   sumHueX[x][y] = sumHueX[x][y-1] + pixel->s * cos((pixel->h)*PI/180);
+   sumHueY[x][y] = sumHueY[x][y-1] + pixel->s * sin((pixel->h)*PI/180);
+   sumSat[x][y] = sumSat[x][y-1] + pixel->s;
+   sumLum[x][y] = sumLum[x][y-1] + pixel->l;
+   for(int k = 0; k<35; k++){
+      if(pixel->h >= (10 * k) && (pixel->h < (10 * k + 10))){
+         hist[x][y][k]= hist[x][y-1][k]+1;
+      }
+
+   }
+
+}
+else{
+   sumHueX[x][y] = pixel->s * cos(pixel->h);
+   sumHueY[x][y] = pixel->s * sin(pixel->h);
+   sumSat[x][y] = pixel->s;
+   sumLum[x][y] = pixel->l;
+   for(int k = 0; k<35; k++){
+      if(pixel->h >= (10 * k) && (pixel->h < (10 * k + 10))){
+         hist[x][y][k]++;
+      }
+   }
+}*/
 
 			for(unsigned int i=0; i<=x; i++){
 				for(unsigned int j=0; j<=y; j++){
 					HSLAPixel *pixel = im.getPixel(i,j);
 					sumS+=pixel->s;
 					sumL+=pixel->l;
-					sumHX+=pixel->s * cos(pixel->h);
-					sumHY+=pixel->s * sin(pixel->h);
+					cout<<"pixel h:"<<pixel->h<<endl;
+					sumHX+=pixel->s * cos((pixel->h)*PI/180);
+					sumHY+=pixel->s * sin((pixel->h)*PI/180);
 
 					for(int k=0; k<36; k++){
 						if(pixel->h >= (10*k) && pixel->h < (10*k+10)){
 							hist[x][y][k]++;
 						}
-					}
-
-
+					}					
 				}
 			}
+
 			sumHueX[x][y] = sumHX;
 			sumHueY[x][y] = sumHY;
 			sumSat[x][y] = sumS;
@@ -68,10 +123,10 @@ HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 	HSLAPixel average;
 
 	long count = rectArea(ul,lr);
-	cout<< sumSat[lr.first][lr.second]<<endl;
-	cout<< sumSat[ul.first][ul.second]<<endl;
-	cout<< sumSat[lr.first][ul.second]<<endl;
-	cout<< sumSat[ul.first][lr.second]<<endl;
+	cout<< sumHueX[lr.first][lr.second]<<endl;
+	cout<< sumLum[ul.first][ul.second]<<endl;
+	cout<< sumLum[lr.first][ul.second]<<endl;
+	cout<< sumLum[ul.first][lr.second]<<endl;
 	double sumS;
 	double sumL;
 	double sumHX;
@@ -96,7 +151,7 @@ HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 	}
 	else{
 		sumS = sumSat[lr.first][lr.second];
-		sumL = sumSat[lr.first][lr.second];
+		sumL = sumLum[lr.first][lr.second];
 		sumHX = sumHueX[lr.first][lr.second];
 		sumHY = sumHueY[lr.first][lr.second];
 	}
@@ -106,7 +161,15 @@ HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 
 	double X = sumHX/count;
 	double Y = sumHY/count;
-	average.h = atan2(X,Y)*180/PI;
+	cout<<"sum"<<endl;
+	cout<<sumHX<<endl;
+	cout<<sumHY<<endl;
+
+	cout<<X<<endl;
+	cout<<Y<<endl;
+
+
+	average.h = atan2(Y,X)*180/PI;
 
 	average.a = 1.0;
 
