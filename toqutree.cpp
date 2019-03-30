@@ -66,7 +66,25 @@ PNG toqutree::render(){
 // quadtree, instead.
 
 /* your code here */
+	PNG *image = new PNG(pow(2,root->dimension), pow(2,root->dimension));
+	return render(root, *image);
+}
 
+PNG toqutree::render(Node* subRoot, PNG & image){
+	if(subRoot->dimension == 0){
+		unsigned int x = subRoot->center.first;
+		unsigned int y = subRoot->center.second;
+		HSLAPixel* pixel = image.getPixel(x,y);
+		*pixel = subRoot->avg;
+		return image;
+	}
+	else{
+		render(subRoot->NW, image);
+		render(subRoot->NE, image);
+		render(subRoot->SE, image);
+		render(subRoot->SW, image);
+		return image;
+	}
 }
 
 /* oops, i left the implementation of this one in the file! */

@@ -189,6 +189,8 @@ private:
    */
    Node * buildTree(PNG * im, int k);
 
+   PNG render(Node* subRoot, PNG & image);
+
    /* =================== end of private PA3 functions ============== */
 };
 
