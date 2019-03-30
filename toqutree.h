@@ -191,6 +191,8 @@ private:
 
    PNG render(Node* subRoot, PNG & image);
 
+   void prune(Node* subRoot, double tol);
+
    /* =================== end of private PA3 functions ============== */
 };
 

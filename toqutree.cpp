@@ -71,7 +71,7 @@ PNG toqutree::render(){
 }
 
 PNG toqutree::render(Node* subRoot, PNG & image){
-	if(subRoot->dimension == 0){
+	if(subRoot->NW == NULL && subRoot->NE == NULL && subRoot->SE == NULL && subRoot->SW ==NULL){
 		unsigned int x = subRoot->center.first;
 		unsigned int y = subRoot->center.second;
 		HSLAPixel* pixel = image.getPixel(x,y);
@@ -79,10 +79,21 @@ PNG toqutree::render(Node* subRoot, PNG & image){
 		return image;
 	}
 	else{
-		render(subRoot->NW, image);
-		render(subRoot->NE, image);
-		render(subRoot->SE, image);
-		render(subRoot->SW, image);
+		if(subRoot->NW!=NULL){
+			render(subRoot->NW, image);
+		}
+
+		if(subRoot->NE!=NULL){
+			render(subRoot->NE, image);
+		}
+
+		if(subRoot->SE!=NULL){
+			render(subRoot->SE, image);
+		}
+
+		if(subRoot->SW!=NULL){
+			render(subRoot->SW, image);
+		}
 		return image;
 	}
 }
@@ -90,8 +101,31 @@ PNG toqutree::render(Node* subRoot, PNG & image){
 /* oops, i left the implementation of this one in the file! */
 void toqutree::prune(double tol){
 
-	//prune(root,tol);
+	prune(root,tol);
 
+}
+
+void toqutree::prune(Node* subRoot, double tol){
+	if(subRoot->dimension == 0){
+		return;
+	}
+
+	else{
+		HSLAPixel average = subRoot->avg;
+		if(average.dist(subRoot->NW->avg)<=tol && average.dist(subRoot->NE->avg)<=tol && average.dist(subRoot->SE->avg)<=tol && average.dist(subRoot->SW->avg)<=tol){
+			clear(subRoot->NW);
+			clear(subRoot->NE);
+			clear(subRoot->SW);
+			clear(subRoot->SE);
+			render();
+		}
+		else{
+			prune(subRoot->NW, tol);
+			prune(subRoot->NE, tol);
+			prune(subRoot->SW, tol);
+			prune(subRoot->SE, tol);
+		}
+	}
 }
 
 /* called by destructor and assignment operator*/
