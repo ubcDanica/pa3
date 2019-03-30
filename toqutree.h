@@ -193,6 +193,8 @@ private:
 
    void prune(Node* subRoot, double tol);
 
+   int size(Node* subRoot);
+
    /* =================== end of private PA3 functions ============== */
 };
 

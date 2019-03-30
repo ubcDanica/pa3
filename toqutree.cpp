@@ -42,6 +42,16 @@ toqutree::toqutree(PNG & imIn, int k){
 
 int toqutree::size() {
 /* your code here */
+	return size(root);
+}
+
+int toqutree::size(Node* subRoot){
+	if(subRoot->dimension ==0 && subRoot->NW ==NULL){
+		return 1;
+	}
+	else{
+		return 1+size(subRoot->NW)+size(subRoot->NE)+size(subRoot->SW)+size(subRoot->SE);
+	}
 }
 
 
@@ -71,7 +81,7 @@ PNG toqutree::render(){
 }
 
 PNG toqutree::render(Node* subRoot, PNG & image){
-	if(subRoot->NW == NULL && subRoot->NE == NULL && subRoot->SE == NULL && subRoot->SW ==NULL){
+	if(subRoot->NW == NULL){
 		unsigned int x = subRoot->center.first;
 		unsigned int y = subRoot->center.second;
 		HSLAPixel* pixel = image.getPixel(x,y);
@@ -79,21 +89,11 @@ PNG toqutree::render(Node* subRoot, PNG & image){
 		return image;
 	}
 	else{
-		if(subRoot->NW!=NULL){
-			render(subRoot->NW, image);
-		}
+		render(subRoot->NW, image);
+		render(subRoot->NE, image);
+		render(subRoot->SE, image);
+		render(subRoot->SW, image);
 
-		if(subRoot->NE!=NULL){
-			render(subRoot->NE, image);
-		}
-
-		if(subRoot->SE!=NULL){
-			render(subRoot->SE, image);
-		}
-
-		if(subRoot->SW!=NULL){
-			render(subRoot->SW, image);
-		}
 		return image;
 	}
 }
