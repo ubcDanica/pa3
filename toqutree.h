@@ -197,6 +197,8 @@ private:
 
    int size(Node* subRoot);
 
+   void copy(Node *& subRoot, const Node* other);
+
 
    /* =================== end of private PA3 functions ============== */
 };

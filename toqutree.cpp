@@ -259,6 +259,18 @@ void toqutree::prune(Node* subRoot, double tol){
 /* called by destructor and assignment operator*/
 void toqutree::clear(Node * & curr){
 /* your code here */
+	if(curr->NW ==NULL){
+		delete(curr);
+		curr = NULL;
+	}
+	else{
+		clear(curr->NW);
+		clear(curr->NE);
+		clear(curr->SW);
+		clear(curr->SE);
+		delete(curr);
+		curr = NULL;
+	}
 }
 
 /* done */
@@ -266,6 +278,34 @@ void toqutree::clear(Node * & curr){
 toqutree::Node * toqutree::copy(const Node * other) {
 
 /* your code here */
+	Node *newRoot = new Node(other->center, other->dimension, other->avg);
+	if(other!=NULL){
+		copy(newRoot, other);
+	}
+	return newRoot;
+}
+
+void toqutree::copy(Node *& subRoot, const Node* other){
+	if(other->NW==NULL){
+		Node * newNode = new Node(other->center, other->dimension, other->avg);
+		subRoot = newNode;
+		newNode = NULL;
+		subRoot->NW = NULL;
+		subRoot->NE = NULL;
+		subRoot->SW = NULL;
+		subRoot->SE = NULL;
+	}
+	else{
+		Node * newNode = new Node(other->center, other->dimension, other->avg);
+		subRoot = newNode;
+		newNode = NULL;
+		copy(subRoot->NW, other->NW);
+		copy(subRoot->NE, other->NE);
+		copy(subRoot->SW, other->SW);
+		copy(subRoot->SE, other->SE);
+
+	}
+
 }
 
 
