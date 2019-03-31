@@ -189,6 +189,8 @@ private:
    */
    Node * buildTree(PNG * im, int k);
 
+   cs221util::PNG* buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr);
+
    /* =================== end of private PA3 functions ============== */
 };
 
