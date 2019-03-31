@@ -191,6 +191,13 @@ private:
 
    cs221util::PNG* buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr);
 
+   PNG render(Node* subRoot, PNG & image);
+
+   void prune(Node* subRoot, double tol);
+
+   int size(Node* subRoot);
+
+
    /* =================== end of private PA3 functions ============== */
 };
 
