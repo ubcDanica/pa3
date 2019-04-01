@@ -50,36 +50,83 @@ int toqutree::size() {
 	return size(root);
 }
 
-int toqutree::size(Node* subRoot){
-	if(subRoot->dimension ==0 && subRoot->NW ==NULL){
-		return 1;
-	}
-	else{
-		return 1+size(subRoot->NW)+size(subRoot->NE)+size(subRoot->SW)+size(subRoot->SE);
-	}
-
-}
-
-
 toqutree::Node * toqutree::buildTree(PNG * im, int k) {
-if(k > 0) {
 	stats a = stats(*im);
+	if(k > 0) {
 	pair<int,int> ul (0,0);
 	pair<int,int> lr (2 ^ k - 1, 2 ^ k -1);
-	pair<int,int> center;
-	HSLAPixel ctr = a.getAvg(ul,lr);
+	pair<unsigned int,unsigned int> center;
+	HSLAPixel avg = a.getAvg(ul,lr);
+	double minSum = -1;
+	for(int x = 2^(k-2); x < (2^(k-2)+2^(k-1)); x++){
+		for(int y = 2^(k-2); y < (2^(k-2)+2^(k-1)); y++){
+			double sum = 0;
+			pair<int, int> ul;
+			pair<int, int> lr;
+			ul.first = x;
+			ul.second = y;
+			lr.first = x + 2 ^ (k - 1)-1;
+			lr.second = y + 2 ^ (k - 1)-1;
+			sum += a.entropy(ul,lr);
+			ul.first = lr.first + 1;
+			ul.second = lr.second + 1;
+			lr.first = x - 1;
+			lr.second = y - 1;
+			sum += a.entropy(ul,lr);
+			ul.first = x + 2 ^ (k-1);
+			ul.second = y;
+			lr.first = x - 1;
+			lr.second = y + 2^(k-1)-1;
+			sum += a.entropy(ul,lr);
+			ul.first = x;
+			ul.second = y + 2^(k-1);
+			lr.first = x + 2^(k-1)-1;
+			lr.second = y - 1;
+			sum += a.entropy(ul,lr);
 
+			if(minSum == -1){
+				minSum = sum;
+				center.first = x;
+				center.second = y;
+			}
+			else if(minSum > sum){
+				minSum = sum;
+				center.first = x;
+				center.second = y;
+			}
+		}
+	}
 
-	Node * mainNode = new Node(center,k,ctr);
-	pair<int,int> subCoordinates;
-	subCoordinates.first = center.first + 2 ^ (k - 1) - 1;
-	subCoordinates.second = center.second + 2 ^ (k - 1) - 1;
-	mainNode->SE = buildTree(buildPNG(im, mainNode->center, subCoordinates),k-1);
-	subCoordinates.first = center.first - 1;
-	subCoordinates.second = center.second - 1;
-	mainNode->NW = buildTree(buildPNG(im, mainNode->center, subCoordinates),k-1);
-	mainNode->SW = buildTree(im,k-1);
-	mainNode->NE = buildTree(im,k-1);
+	Node * mainNode = new Node(center,k,avg);
+
+	ul.first = center.first;
+	ul.second = center.second;
+	lr.first = center.first + 2 ^ (k - 1)-1;
+	lr.second = center.second + 2 ^ (k - 1)-1;
+	mainNode->SE = buildTree(buildPNG(im, ul, lr),k-1);
+	ul.first = lr.first + 1;
+	ul.second = lr.second + 1;
+	lr.first = center.first - 1;
+	lr.second = center.second - 1;
+	mainNode->NW = buildTree(buildPNG(im, ul, lr),k-1);
+	ul.first = center.first + 2 ^ (k-1);
+	ul.second = center.second;
+	lr.first = center.first - 1;
+	lr.second = center.second + 2^(k-1)-1;
+	mainNode->SW = buildTree(buildPNG(im, ul, lr),k-1);
+	ul.first = center.first;
+	ul.second = center.second + 2^(k-1);
+	lr.first = center.first + 2^(k-1)-1;
+	lr.second = center.second - 1;
+	mainNode->NE = buildTree(buildPNG(im, ul, lr),k-1);
+	return mainNode;
+}
+
+else{
+	pair<int,int> center (0,0);
+	HSLAPixel avg = a.getAvg(center,center);
+	Node * mainNode = new Node(center,k,avg);
+	return mainNode;
 }
 // Note that you will want to practice careful memory use
 // In this function. We pass the dynamically allocated image
@@ -91,15 +138,15 @@ if(k > 0) {
 
 }
 
-cs221util::PNG* toqutree::buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr){
-	int I = 0;
-	int J = 0;
+cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, pair<unsigned int,unsigned int> lr){
+	unsigned int I = 0;
+	unsigned int J = 0;
 	PNG *subIm;
 	if(ul.first > lr.first && ul.second > ul.second ){
 		subIm = new PNG(im->width() - ul.first + lr.first, im->height()- ul.second + lr.second);
 
-		for (int i = ul.first; i<im->width(); i++){
-			for(int j = ul.second; j<im->height();j++){
+		for (unsigned int i = ul.first; i<im->width(); i++){
+			for(unsigned int j = ul.second; j<im->height();j++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -109,8 +156,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr){
 
 		J = 0;
 		int temp = 0;
-		for (int i = 0; i<=lr.first; i++){
-			for(int j = ul.second; j<im->height();j++){
+		for (unsigned int i = 0; i<=lr.first; i++){
+			for(unsigned int j = ul.second; j<im->height();j++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -121,8 +168,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr){
 
 		I = 0;
 		J = temp;
-		for (int i = ul.first; i<im->width(); i++){
-			for(int j = 0; j<=lr.second; j++){
+		for (unsigned int i = ul.first; i<im->width(); i++){
+			for(unsigned int j = 0; j<=lr.second; j++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -131,8 +178,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr){
 		}
 
 		J = temp;
-		for(int i = 0; i<= lr.first; i++){
-			for(int j = 0; j<=lr.second; j++){
+		for(unsigned int i = 0; i<= lr.first; i++){
+			for(unsigned int j = 0; j<=lr.second; j++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -144,8 +191,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr){
 	}
 	else if(ul.first > lr.first){
 		subIm = new PNG(im->width() - ul.first + lr.first, ul.second - lr.second);
-		for(int i = ul.first; i<im->width(); i++){
-			for(int j = ul.second; j<=lr.second; j++){
+		for(unsigned int i = ul.first; i<im->width(); i++){
+			for(unsigned int j = ul.second; j<=lr.second; j++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -153,8 +200,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr){
 			I++;
 		}
 
-		for(int i = 0; i<= lr.first; i++){
-			for(int j = ul.second; j<=lr.second; j++){
+		for(unsigned int i = 0; i<= lr.first; i++){
+			for(unsigned int j = ul.second; j<=lr.second; j++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -165,16 +212,16 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr){
 	}
 	else if(ul.second > lr.second){
 		subIm = new PNG(ul.first - lr.first, im->height()- ul.second + lr.second);
-		for(int j = ul.second; j<im->height(); j++){
-			for (int i = ul.first; i<=lr.first; i++){
+		for(unsigned int j = ul.second; j<im->height(); j++){
+			for (unsigned int i = ul.first; i<=lr.first; i++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				I++;
 			}
 			I = 0;
 			J++;
 		}
-		for(int j = 0; j<=lr.second; j++){
-			for(int i = ul.first; i <= lr.first; i++){
+		for(unsigned int j = 0; j<=lr.second; j++){
+			for(unsigned int i = ul.first; i <= lr.first; i++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				I++;
 			}
@@ -185,8 +232,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr){
 	}
 	else {
 		subIm = new PNG(lr.first - ul.first + 1, lr.second - ul.second + 1);
-		for (int i = ul.first; i < lr.first + 1; i++) {
-			for (int j = ul.second; j < lr.second + 1; j++) {
+		for (unsigned int i = ul.first; i < lr.first + 1; i++) {
+			for (unsigned int j = ul.second; j < lr.second + 1; j++) {
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
