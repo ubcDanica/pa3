@@ -28,9 +28,9 @@ stats::stats(PNG & im) {
 
 			hist[x][y].resize(36);
 			if (x > 0 && y > 0) {
-				sumHueX[x][y] = sumHueX[x - 1][y] + sumHueX[x][y - 1] + pixel->s * cos((pixel->h) * PI / 180) -
+				sumHueX[x][y] = sumHueX[x - 1][y] + sumHueX[x][y - 1] + cos((pixel->h) * PI / 180) -
 								sumHueX[x - 1][y - 1];
-				sumHueY[x][y] = sumHueY[x - 1][y] + sumHueY[x][y - 1] + pixel->s * sin((pixel->h) * PI / 180) -
+				sumHueY[x][y] = sumHueY[x - 1][y] + sumHueY[x][y - 1] + sin((pixel->h) * PI / 180) -
 								sumHueY[x - 1][y - 1];
 				sumSat[x][y] = sumSat[x - 1][y] + sumSat[x][y - 1] + pixel->s - sumSat[x - 1][y - 1];
 
@@ -46,8 +46,8 @@ stats::stats(PNG & im) {
 					}
 				}
 			} else if (x > 0 && y == 0) {
-				sumHueX[x][y] = sumHueX[x - 1][y] + pixel->s * cos((pixel->h) * PI / 180);
-				sumHueY[x][y] = sumHueY[x - 1][y] + pixel->s * sin((pixel->h) * PI / 180);
+				sumHueX[x][y] = sumHueX[x - 1][y] + cos((pixel->h) * PI / 180);
+				sumHueY[x][y] = sumHueY[x - 1][y] + sin((pixel->h) * PI / 180);
 				sumSat[x][y] = sumSat[x - 1][y] + pixel->s;
 				sumLum[x][y] = sumLum[x - 1][y] + pixel->l;
 				cout << "sumlum2: "<<sumLum[x][y] << endl;
@@ -61,8 +61,8 @@ stats::stats(PNG & im) {
 				}
 
 			} else if (y > 0 && x == 0) {
-				sumHueX[x][y] = sumHueX[x][y - 1] + pixel->s * cos((pixel->h) * PI / 180);
-				sumHueY[x][y] = sumHueY[x][y - 1] + pixel->s * sin((pixel->h) * PI / 180);
+				sumHueX[x][y] = sumHueX[x][y - 1] + cos((pixel->h) * PI / 180);
+				sumHueY[x][y] = sumHueY[x][y - 1] + sin((pixel->h) * PI / 180);
 				sumSat[x][y] = sumSat[x][y - 1] + pixel->s;
 				sumLum[x][y] = sumLum[x][y - 1] + pixel->l;
 				cout << "sumlum3: "<<sumLum[x][y] << endl;
@@ -76,8 +76,8 @@ stats::stats(PNG & im) {
 
 				}
 			} else {
-				sumHueX[x][y] = pixel->s * cos(pixel->h);
-				sumHueY[x][y] = pixel->s * sin(pixel->h);
+				sumHueX[x][y] = cos(pixel->h);
+				sumHueY[x][y] = sin(pixel->h);
 				sumSat[x][y] = pixel->s;
 				sumLum[x][y] = pixel->l;
 				cout << "sumlum4: "<<sumLum[x][y] << endl;
