@@ -199,7 +199,6 @@ private:
 
    void copy(Node *& subRoot, const Node* other);
 
->>>>>>> cdd99b42b4cbb6208f43fa935b275fe35952245d
 
    /* =================== end of private PA3 functions ============== */
 };
