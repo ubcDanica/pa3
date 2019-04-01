@@ -45,7 +45,9 @@ root = buildTree(im,k);
 }
 
 int toqutree::size() {
-	return 0;
+
+/* your code here */
+	return size(root);
 }
 
 
