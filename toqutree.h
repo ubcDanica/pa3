@@ -189,14 +189,7 @@ private:
    */
    Node * buildTree(PNG * im, int k);
 
-   cs221util::PNG* buildPNG(PNG *im, pair<int,int> ul, pair<int,int> lr);
-
-   PNG render(Node* subRoot, PNG & image);
-
-   void prune(Node* subRoot, double tol);
-
-   int size(Node* subRoot);
-
+   cs221util::PNG* buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, pair<unsigned int,unsigned int> lr);
 
    /* =================== end of private PA3 functions ============== */
 };
