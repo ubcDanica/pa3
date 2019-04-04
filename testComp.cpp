@@ -64,7 +64,7 @@ TEST_CASE("stats::basic entropy","[weight=1][part=stats]"){
     REQUIRE(result == 2);
 }
 
-/*TEST_CASE("toqutree::basic ctor render","[weight=1][part=toqutree]"){
+TEST_CASE("toqutree::basic ctor render","[weight=1][part=toqutree]"){
     PNG img;
     img.readFromFile("images/stanleySquare.png");
 
@@ -101,5 +101,5 @@ TEST_CASE("toqutree::basic prune","[weight=1][part=toqutree]"){
     result.convert();
 
     REQUIRE(expected==result);
-}*/
+}
 
