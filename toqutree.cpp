@@ -64,33 +64,33 @@ toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 	stats a = stats(*im);
 	if(k > 0) {
 	pair<int,int> ul (0,0);
-	pair<int,int> lr (2 ^ k - 1, 2 ^ k -1);
+	pair<int,int> lr (pow(2, k) - 1, pow(2,k) -1);
 	pair<unsigned int,unsigned int> center;
 	HSLAPixel avg = a.getAvg(ul,lr);
 	double minSum = -1;
-	for(int x = 2^(k-2); x < (2^(k-2)+2^(k-1)); x++){
-		for(int y = 2^(k-2); y < (2^(k-2)+2^(k-1)); y++){
+	for(int x = pow(2,k-2); x < (pow(2,k-2)+pow(2,k-1)); x++){
+		for(int y = pow(2,k-2); y < ( pow(2,k-2)+ pow(2,k-1)); y++){
 			double sum = 0;
 			pair<int, int> ul;
 			pair<int, int> lr;
 			ul.first = x;
 			ul.second = y;
-			lr.first = x + 2 ^ (k - 1)-1;
-			lr.second = y + 2 ^ (k - 1)-1;
+			lr.first = x + pow(2, k - 1)-1;
+			lr.second = y + pow(2, k - 1)-1;
 			sum += a.entropy(ul,lr);
 			ul.first = lr.first + 1;
 			ul.second = lr.second + 1;
 			lr.first = x - 1;
 			lr.second = y - 1;
 			sum += a.entropy(ul,lr);
-			ul.first = x + 2 ^ (k-1);
+			ul.first = x + pow(2,k-1);
 			ul.second = y;
 			lr.first = x - 1;
-			lr.second = y + 2^(k-1)-1;
+			lr.second = y + pow(2,k-1)-1;
 			sum += a.entropy(ul,lr);
 			ul.first = x;
-			ul.second = y + 2^(k-1);
-			lr.first = x + 2^(k-1)-1;
+			ul.second = y + pow(2,k-1);
+			lr.first = x + pow(2,k-1)-1;
 			lr.second = y - 1;
 			sum += a.entropy(ul,lr);
 
@@ -111,22 +111,22 @@ toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 
 	ul.first = center.first;
 	ul.second = center.second;
-	lr.first = center.first + 2 ^ (k - 1)-1;
-	lr.second = center.second + 2 ^ (k - 1)-1;
+	lr.first = center.first + pow(2,k - 1)-1;
+	lr.second = center.second + pow(2,k - 1)-1;
 	mainNode->SE = buildTree(buildPNG(im, ul, lr),k-1);
 	ul.first = lr.first + 1;
 	ul.second = lr.second + 1;
 	lr.first = center.first - 1;
 	lr.second = center.second - 1;
 	mainNode->NW = buildTree(buildPNG(im, ul, lr),k-1);
-	ul.first = center.first + 2 ^ (k-1);
+	ul.first = center.first + pow(2,k-1);
 	ul.second = center.second;
 	lr.first = center.first - 1;
-	lr.second = center.second + 2^(k-1)-1;
+	lr.second = center.second + pow(2,k-1)-1;
 	mainNode->SW = buildTree(buildPNG(im, ul, lr),k-1);
 	ul.first = center.first;
-	ul.second = center.second + 2^(k-1);
-	lr.first = center.first + 2^(k-1)-1;
+	ul.second = center.second + pow(2,k-1);
+	lr.first = center.first + pow(2,k-1)-1;
 	lr.second = center.second - 1;
 	mainNode->NE = buildTree(buildPNG(im, ul, lr),k-1);
 	return mainNode;
