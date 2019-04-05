@@ -161,6 +161,9 @@ HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 vector<int> stats::buildHist(pair<int,int> ul, pair<int,int> lr){
 
 /* your code here */
+	cout<<"build hist"<<endl;
+	cout<<"ul: "<< ul.first<<", "<<ul.second<<endl;
+	cout<<"lr: "<<lr.first<<", "<<lr.second<<endl;
 	vector<int> newHist(36);
 	for(int k=0; k<36; k++){
 		if(ul.first>0 && ul.second>0){

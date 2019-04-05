@@ -77,22 +77,22 @@ toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 			ul.second = y;
 			lr.first = x + pow(2, k - 1)-1;
 			lr.second = y + pow(2, k - 1)-1;
-			sum += a.entropy(ul,lr);
+			sum += calEntropy(im, ul,lr);
 			ul.first = lr.first + 1;
 			ul.second = lr.second + 1;
 			lr.first = x - 1;
 			lr.second = y - 1;
-			sum += a.entropy(ul,lr);
+			sum += calEntropy(im, ul,lr);
 			ul.first = x + pow(2,k-1);
 			ul.second = y;
 			lr.first = x - 1;
 			lr.second = y + pow(2,k-1)-1;
-			sum += a.entropy(ul,lr);
+			sum += calEntropy(im, ul,lr);
 			ul.first = x;
 			ul.second = y + pow(2,k-1);
 			lr.first = x + pow(2,k-1)-1;
 			lr.second = y - 1;
-			sum += a.entropy(ul,lr);
+			sum += calEntropy(im, ul,lr);
 
 			if(minSum == -1){
 				minSum = sum;
@@ -138,6 +138,7 @@ else{
 	Node * mainNode = new Node(center,k,avg);
 	return mainNode;
 }
+
 // Note that you will want to practice careful memory use
 // In this function. We pass the dynamically allocated image
 // via pointer so that it may be released after it is used .
@@ -145,8 +146,28 @@ else{
 // declare a dynamically allocated stats object, and free it
 // once you've used it to choose a split point, and calculate
 // an average.
-
 }
+
+double toqutree::calEntropy(PNG *im, pair<int,int> ul, pair<int,int> lr){
+
+	PNG* pic = buildPNG(im, ul, lr);
+	stats newStat = stats(*pic);
+
+	pair<int,int> newLR;
+	newLR.first = pic->width() -1;
+	newLR.second = pic->height() -1;
+	
+	pair<int,int> newUL;
+	newUL.first = 0;
+	newUL.second = 0;
+
+	double entropy = newStat.entropy(newUL, newLR);
+	delete(pic);
+	pic = NULL;
+	return entropy;
+}
+
+
 
 cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, pair<unsigned int,unsigned int> lr){
 	unsigned int I = 0;
