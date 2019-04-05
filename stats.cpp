@@ -9,8 +9,6 @@ stats::stats(PNG & im) {
 	sumLum.resize(im.width());
 
 	hist.resize(im.width());
-	cout << "width:" << im.width() << endl;
-	cout << "height:" << im.height() << endl;
 
 	for (unsigned int x = 0; x < im.width(); x++) {
 		//cout<<"x:"<<x<<endl;
@@ -103,7 +101,21 @@ long stats::rectArea(pair<int,int> ul, pair<int,int> lr){
 
 /* your code here */
 
-	return (lr.first - ul.first +1) * (lr.second - ul.second+1);
+	if(ul.first > lr.first && ul.second >lr.second){
+		return (hist.size() - ul.first + lr.first +1) * (hist[0].size()- ul.second + lr.second +1);
+	}
+
+	else if(ul.first > lr.first){
+		return (hist.size() - ul.first + lr.first +1) * (lr.second - ul.second +1);
+	}
+
+	else if(ul.second > lr.second){
+		return (lr.first - ul.first + 1) * (hist[0].size()- ul.second + lr.second+1);
+	}
+	else{
+		return (lr.first - ul.first +1) * (lr.second - ul.second+1);
+	}
+
 }
 
 HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
@@ -161,31 +173,100 @@ HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 vector<int> stats::buildHist(pair<int,int> ul, pair<int,int> lr){
 
 /* your code here */
-	cout<<"build hist"<<endl;
-	cout<<"ul: "<< ul.first<<", "<<ul.second<<endl;
-	cout<<"lr: "<<lr.first<<", "<<lr.second<<endl;
+
 	vector<int> newHist(36);
-	for(int k=0; k<36; k++){
-		if(ul.first>0 && ul.second>0){
-			newHist[k] = hist[lr.first][lr.second][k] + hist[ul.first-1][ul.second-1][k] - hist[ul.first-1][lr.second][k] - hist[lr.first][ul.second-1][k];
-		}
-		else if(ul.second > 0){
-			newHist[k] = hist[lr.first][lr.second][k] - hist[lr.first][ul.second-1][k];
-		}
-		else if(ul.first > 0){
-			newHist[k] = hist[lr.first][lr.second][k] - hist[ul.first-1][lr.second][k];
-		}
-		else{
-			newHist[k] = hist[lr.first][lr.second][k];
+
+	if(ul.first>lr.first && ul.second>lr.second){
+		//cout<<"1"<<endl;
+		for(int k=0; k<36; k++){
+			pair<int, int> whole;
+			whole.first = hist.size() -1;
+			whole.second = hist[0].size() -1;
+
+			pair<int, int> right;
+			right.first = hist.size() -1;
+			right.second = lr.second;
+
+			pair<int ,int> up;
+			up.first = ul.first;
+			up.second = 0;
+
+			pair<int, int> left;
+			left.first = 0;
+			left.second = ul.second;
+
+			pair<int, int> down;
+			down.first = lr.first;
+			down.second = hist[0].size() -1;
+
+			newHist[k] = hist[lr.first][lr.second][k] + buildHistHelper(ul, whole, k) + buildHistHelper(up,right, k) + buildHistHelper(left, down, k);
 		}
 	}
 
-/*	for(int k=0; k<36; k++){
+	else if(ul.first > lr.first){
+		//cout<<"2"<<endl;
+		for(int k=0; k<36; k++){
+			pair<int, int> right;
+			right.first = hist.size()-1;
+			right.second = lr.second;
+
+			pair<int, int> left;
+			left.first = 0;
+			left.second = ul.second;
+
+			newHist[k] = buildHistHelper(ul, right, k) + buildHistHelper(left, lr, k); 
+		}
+
+	}
+
+	else if(ul.second > lr.second){
+		//cout<<"3"<<endl;
+		for(int k=0; k<36; k++){
+			pair<int, int> up;
+			up.first = ul.first;
+			up.second = 0;
+
+			pair<int, int> down;
+			down.first = lr.first;
+			down.second = hist[0].size()-1;
+
+			newHist[k] = buildHistHelper(up, lr, k) + buildHistHelper(ul, down, k);
+
+		}
+	}
+
+	else{
+/*		cout<<"4"<<endl;
+		cout<<"ul: "<<ul.first<<", "<<ul.second<<endl;
+		cout<<"lr: "<<lr.first<<", "<<lr.second<<endl;
+		cout<<"Image height: " << hist[0].size()<<endl;*/
+		for(int k=0; k<36; k++){
+			newHist[k] = buildHistHelper(ul, lr, k);
+		}
+	}
+
+/*	for(int k=0; k<36; k++){ 
 		cout<<"k: "<<k<<"   "<<newHist[k]<<endl;
 	}*/
 	return newHist;
 }
-
+int stats::buildHistHelper(pair<int,int> ul, pair<int,int>lr, int k){
+	int helper;
+	if(ul.first>0 && ul.second>0){
+		helper = hist[lr.first][lr.second][k] + hist[ul.first-1][ul.second-1][k] - hist[ul.first-1][lr.second][k] - hist[lr.first][ul.second-1][k];
+	}
+	else if(ul.second > 0){
+		helper = hist[lr.first][lr.second][k] - hist[lr.first][ul.second-1][k];
+	}
+	else if(ul.first > 0){
+		helper = hist[lr.first][lr.second][k] - hist[ul.first-1][lr.second][k];
+	}
+	else{
+		helper = hist[lr.first][lr.second][k];
+	}
+	return helper;
+}
+	
 // takes a distribution and returns entropy
 // partially implemented so as to avoid rounding issues.
 double stats::entropy(vector<int> & distn,int area){
@@ -199,6 +280,8 @@ double stats::entropy(vector<int> & distn,int area){
             entropy += ((double) distn[i]/(double) area) 
                                     * log2((double) distn[i]/(double) area);
     }
+
+    //cout<<"entropy: "<<-1* entropy<<endl;
 
     return  -1 * entropy;
 

@@ -61,6 +61,8 @@ public:
     // described above.
     vector<int> buildHist(pair<int,int> ul, pair<int,int> lr);
 
+    int buildHistHelper(pair<int,int> ul, pair<int,int>lr, int k);
+
     // given any rectangle, return the total entropy over that rect.
 	/* @param ul is (x,y) of the upper left corner of the rectangle 
 	* @param lr is (x,y) of the lower right corner of the rectangle */

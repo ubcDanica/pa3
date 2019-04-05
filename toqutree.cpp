@@ -61,6 +61,9 @@ int toqutree::size(Node* subRoot){
 
 toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 
+	cout<<"enter buildtree"<<endl;
+	cout<<"k: "<<k<<endl;
+
 	stats a = stats(*im);
 	if(k > 1) {
 	pair<int,int> ul (0,0);
@@ -68,31 +71,120 @@ toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 	pair<unsigned int,unsigned int> center;
 	HSLAPixel avg = a.getAvg(ul,lr);
 	double minSum = -1;
-	for(int x = pow(2,k-2); x < (pow(2,k-2)+pow(2,k-1)); x++){
-		for(int y = pow(2,k-2); y < ( pow(2,k-2)+ pow(2,k-1)); y++){
+	for(int x = pow(2,k-2); x < (pow(2,k-2)+pow(2,k-1)-1); x++){
+		for(int y = pow(2,k-2); y < ( pow(2,k-2)+ pow(2,k-1) - 1); y++){
+			//cout<<"x,y: "<<x<<", "<<y<<endl;
 			double sum = 0;
-			pair<int, int> ul;
-			pair<int, int> lr;
-			ul.first = x;
-			ul.second = y;
-			lr.first = x + pow(2, k - 1)-1;
-			lr.second = y + pow(2, k - 1)-1;
-			sum += calEntropy(im, ul,lr);
-			ul.first = lr.first + 1;
-			ul.second = lr.second + 1;
-			lr.first = x - 1;
-			lr.second = y - 1;
-			sum += calEntropy(im, ul,lr);
-			ul.first = x + pow(2,k-1);
-			ul.second = y;
-			lr.first = x - 1;
-			lr.second = y + pow(2,k-1)-1;
-			sum += calEntropy(im, ul,lr);
-			ul.first = x;
-			ul.second = y + pow(2,k-1);
-			lr.first = x + pow(2,k-1)-1;
-			lr.second = y - 1;
-			sum += calEntropy(im, ul,lr);
+			if(im->width()-x < pow(2,k-1) && im->height()-y < pow(2,k-1)){
+				pair<int, int> ul;
+				pair<int, int> lr;
+				ul.first = x;
+				ul.second = y;
+				lr.first = pow(2,k-1) - (im->width()-x) -1;
+				lr.second = pow(2,k-1) - (im->height()-y) -1;
+				sum+= a.entropy(ul,lr);
+
+				ul.first = lr.first+1;
+				ul.second = lr.second+1;
+				lr.first = x-1;
+				lr.second = y-1;
+				sum+=a.entropy(ul,lr);
+
+				ul.first = x - pow(2,k-1);
+				ul.second = y;
+				lr.first = x -1;
+				lr.second = pow(2,k-1) - (im->height()-y) -1;
+				sum+=a.entropy(ul,lr);
+
+				ul.first = x;
+				ul.second = lr.second+1;
+				lr.first = pow(2,k-1) - (im->width()-x) -1;
+				lr.second = y -1;
+				sum+=a.entropy(ul,lr);
+			}
+
+			else if(im->width()-x < pow(2,k-1)){
+				pair<int, int> ul;
+				pair<int, int> lr;
+				ul.first = x; 
+				ul.second = y;
+				lr.first = pow(2,k-1) - (im->width()-x) -1;
+				lr.second = y + pow(2, k-1)-1;
+				sum+=a.entropy(ul, lr);
+
+				ul.first = lr.first +1;
+				ul.second = y;
+				lr.first = x -1;
+				lr.second = y + pow(2, k-1)-1;
+				sum+=a.entropy(ul, lr);
+
+				ul.first = x;
+				ul.second = lr.second +1;
+				lr.first = pow(2,k-1) - (im->width()-x) -1;
+				lr.second = y-1;
+				sum+=a.entropy(ul, lr);
+
+				ul.first = x - pow(2,k-1);
+				ul.second = y + pow(2,k-1);
+				lr.first = x -1;
+				lr.second = y-1;
+				sum+=a.entropy(ul, lr);
+			}
+
+			else if(im->height()-y < pow(2,k-1)){
+				pair<int, int> ul;
+				pair<int, int> lr;
+				ul.first = x;
+				ul.second = y;
+				lr.first = x + pow(2, k-1)-1;
+				lr.second = pow(2,k-1) - (im->height()-y) -1;
+				sum+=a.entropy(ul, lr);
+
+				ul.first = lr.first +1;
+				ul.second = lr.second +1;
+				lr.first = x-1;
+				lr.second = y-1;
+				sum+=a.entropy(ul, lr);
+
+				ul.first = x;
+				ul.second = y -pow(2, k-1);
+				lr.first = x +pow(2, k-1)-1;
+				lr.second = y-1;
+				sum+=a.entropy(ul, lr);
+
+				ul.first = lr.first+1;
+				ul.second = lr.second+1;
+				lr.first = x-1;
+				lr.second = pow(2,k-1) - (im->height()-y) -1;
+			}
+
+			else{
+				pair<int, int> ul;
+				pair<int, int> lr;
+				ul.first = x;
+				ul.second = y;
+				lr.first = x + pow(2, k - 1)-1;
+				lr.second = y + pow(2, k - 1)-1;
+				sum += a.entropy(ul,lr);
+
+				ul.first = lr.first + 1;
+				ul.second = lr.second + 1;
+				lr.first = x - 1;
+				lr.second = y - 1;
+				sum += a.entropy(ul,lr);
+			
+				ul.first = x + pow(2,k-1);
+				ul.second = y;
+				lr.first = x - 1;
+				lr.second = y + pow(2,k-1)-1;
+				sum += a.entropy(ul,lr);
+			
+				ul.first = x;
+				ul.second = y + pow(2,k-1);
+				lr.first = x + pow(2,k-1)-1;
+				lr.second = y - 1;
+				sum += a.entropy(ul,lr);
+			}
 
 			if(minSum == -1){
 				minSum = sum;
@@ -107,6 +199,7 @@ toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 		}
 	}
 
+	cout<<"get center"<<endl;
 	Node * mainNode = new Node(center,k,avg);
 
 	ul.first = center.first;
@@ -155,8 +248,9 @@ else{
 // an average.
 }
 
-double toqutree::calEntropy(PNG *im, pair<int,int> ul, pair<int,int> lr){
+/*double toqutree::calEntropy(PNG *im, pair<int,int> ul, pair<int,int> lr){
 
+	cout<<"calEntropy"<<endl;
 	PNG* pic = buildPNG(im, ul, lr);
 	stats newStat = stats(*pic);
 
@@ -171,8 +265,10 @@ double toqutree::calEntropy(PNG *im, pair<int,int> ul, pair<int,int> lr){
 	double entropy = newStat.entropy(newUL, newLR);
 	delete(pic);
 	pic = NULL;
+
+	cout<<"exit calEntropy"<<endl;
 	return entropy;
-}
+}*/
 
 
 
@@ -184,11 +280,7 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		subIm = new PNG(im->width() - ul.first + lr.first +1, im->height()- ul.second + lr.second +1);
 
 		for (unsigned int i = ul.first; i<im->width(); i++){
-			for(unsigned int j = ul.second; j<im->height();j++){
-				cout<<"png1 I: "<<I<<endl;
-				cout<<"png1 J: "<<J<<endl;
-				cout<<"png1 i: "<<i<<endl;
-				cout<<"png1 j: "<<j<<endl;                                                                                                                                     
+			for(unsigned int j = ul.second; j<im->height();j++){                                                                                                               
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -279,6 +371,7 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
+			J = 0;
 			I++;
 		}
 	}
