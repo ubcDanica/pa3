@@ -60,91 +60,92 @@ int toqutree::size(Node* subRoot){
 }
 
 toqutree::Node * toqutree::buildTree(PNG * im, int k) {
-    stats a = stats(*im);
-    if(k > 1) {
-        pair<int,int> ul (0,0);
-        pair<int,int> lr (pow(2, k) - 1, pow(2,k) -1);
-        pair<unsigned int,unsigned int> center;
-        HSLAPixel avg = a.getAvg(ul,lr);
-        double minSum = -1;
-        for(int x = pow(2,k-2); x < (pow(2,k-2)+pow(2,k-1)); x++){
-            for(int y = pow(2,k-2); y < ( pow(2,k-2)+ pow(2,k-1)); y++){
-                double sum = 0;
-                pair<int, int> ul;
-                pair<int, int> lr;
-                ul.first = x;
-                ul.second = y;
-                lr.first = x + pow(2, k - 1)-1;
-                lr.second = y + pow(2, k - 1)-1;
-                sum += a.entropy(ul,lr);
-                ul.first = lr.first + 1;
-                ul.second = lr.second + 1;
-                lr.first = x - 1;
-                lr.second = y - 1;
-                sum += a.entropy(ul,lr);
-                ul.first = x + pow(2,k-1);
-                ul.second = y;
-                lr.first = x - 1;
-                lr.second = y + pow(2,k-1)-1;
-                sum += a.entropy(ul,lr);
-                ul.first = x;
-                ul.second = y + pow(2,k-1);
-                lr.first = x + pow(2,k-1)-1;
-                lr.second = y - 1;
-                sum += a.entropy(ul,lr);
 
-                if(minSum == -1){
-                    minSum = sum;
-                    center.first = x;
-                    center.second = y;
-                }
-                else if(minSum > sum){
-                    minSum = sum;
-                    center.first = x;
-                    center.second = y;
-                }
-            }
-        }
+	stats a = stats(*im);
+	if(k > 1) {
+	pair<int,int> ul (0,0);
+	pair<int,int> lr (pow(2, k) - 1, pow(2,k) -1);
+	pair<unsigned int,unsigned int> center;
+	HSLAPixel avg = a.getAvg(ul,lr);
+	double minSum = -1;
+	for(int x = pow(2,k-2); x < (pow(2,k-2)+pow(2,k-1)); x++){
+		for(int y = pow(2,k-2); y < ( pow(2,k-2)+ pow(2,k-1)); y++){
+			double sum = 0;
+			pair<int, int> ul;
+			pair<int, int> lr;
+			ul.first = x;
+			ul.second = y;
+			lr.first = x + pow(2, k - 1)-1;
+			lr.second = y + pow(2, k - 1)-1;
+			sum += calEntropy(im, ul,lr);
+			ul.first = lr.first + 1;
+			ul.second = lr.second + 1;
+			lr.first = x - 1;
+			lr.second = y - 1;
+			sum += calEntropy(im, ul,lr);
+			ul.first = x + pow(2,k-1);
+			ul.second = y;
+			lr.first = x - 1;
+			lr.second = y + pow(2,k-1)-1;
+			sum += calEntropy(im, ul,lr);
+			ul.first = x;
+			ul.second = y + pow(2,k-1);
+			lr.first = x + pow(2,k-1)-1;
+			lr.second = y - 1;
+			sum += calEntropy(im, ul,lr);
 
-        Node * mainNode = new Node(center,k,avg);
+			if(minSum == -1){
+				minSum = sum;
+				center.first = x;
+				center.second = y;
+			}
+			else if(minSum > sum){
+				minSum = sum;
+				center.first = x;
+				center.second = y;
+			}
+		}
+	}
 
-        ul.first = center.first;
-        ul.second = center.second;
-        lr.first = center.first + pow(2,k - 1)-1;
-        lr.second = center.second + pow(2,k - 1)-1;
-        mainNode->SE = buildTree(buildPNG(im, ul, lr),k-1);
-        ul.first = lr.first + 1;
-        ul.second = lr.second + 1;
-        lr.first = center.first - 1;
-        lr.second = center.second - 1;
-        mainNode->NW = buildTree(buildPNG(im, ul, lr),k-1);
-        ul.first = center.first + pow(2,k-1);
-        ul.second = center.second;
-        lr.first = center.first - 1;
-        lr.second = center.second + pow(2,k-1)-1;
-        mainNode->SW = buildTree(buildPNG(im, ul, lr),k-1);
-        ul.first = center.first;
-        ul.second = center.second + pow(2,k-1);
-        lr.first = center.first + pow(2,k-1)-1;
-        lr.second = center.second - 1;
-        mainNode->NE = buildTree(buildPNG(im, ul, lr),k-1);
-        return mainNode;
-    }
+	Node * mainNode = new Node(center,k,avg);
 
-    else if (k == 1){
+	ul.first = center.first;
+	ul.second = center.second;
+	lr.first = center.first + pow(2,k - 1)-1;
+	lr.second = center.second + pow(2,k - 1)-1;
+	mainNode->SE = buildTree(buildPNG(im, ul, lr),k-1);
+	ul.first = lr.first + 1;
+	ul.second = lr.second + 1;
+	lr.first = center.first - 1;
+	lr.second = center.second - 1;
+	mainNode->NW = buildTree(buildPNG(im, ul, lr),k-1);
+	ul.first = center.first + pow(2,k-1);
+	ul.second = center.second;
+	lr.first = center.first - 1;
+	lr.second = center.second + pow(2,k-1)-1;
+	mainNode->SW = buildTree(buildPNG(im, ul, lr),k-1);
+	ul.first = center.first;
+	ul.second = center.second + pow(2,k-1);
+	lr.first = center.first + pow(2,k-1)-1;
+	lr.second = center.second - 1;
+	mainNode->NE = buildTree(buildPNG(im, ul, lr),k-1);
+	return mainNode;
+}
+else if (k == 1){
         pair<int,int> center (1,1);
-        pair<int,int> ul (0,0);
+	pair<int,int> ul(0,0);
         HSLAPixel avg = a.getAvg(ul,center);
         Node * mainNode = new Node(center,k,avg);
         return mainNode;
     }
 
-    else{
-        pair<int,int> center (0,0);
-        HSLAPixel avg = a.getAvg(center,center);
-        Node * mainNode = new Node(center,k,avg);
-        return mainNode;
-    }
+else{
+	pair<int,int> center (0,0);
+	HSLAPixel avg = a.getAvg(center,center);
+	Node * mainNode = new Node(center,k,avg);
+	return mainNode;
+}
+
 // Note that you will want to practice careful memory use
 // In this function. We pass the dynamically allocated image
 // via pointer so that it may be released after it is used .
@@ -152,8 +153,28 @@ toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 // declare a dynamically allocated stats object, and free it
 // once you've used it to choose a split point, and calculate
 // an average.
-
 }
+
+double toqutree::calEntropy(PNG *im, pair<int,int> ul, pair<int,int> lr){
+
+	PNG* pic = buildPNG(im, ul, lr);
+	stats newStat = stats(*pic);
+
+	pair<int,int> newLR;
+	newLR.first = pic->width() -1;
+	newLR.second = pic->height() -1;
+	
+	pair<int,int> newUL;
+	newUL.first = 0;
+	newUL.second = 0;
+
+	double entropy = newStat.entropy(newUL, newLR);
+	delete(pic);
+	pic = NULL;
+	return entropy;
+}
+
+
 
 cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, pair<unsigned int,unsigned int> lr){
 	unsigned int I = 0;

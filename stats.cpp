@@ -36,6 +36,7 @@ stats::stats(PNG & im) {
 
 				sumLum[x][y] = sumLum[x - 1][y] + sumLum[x][y - 1] + pixel->l - sumLum[x - 1][y - 1];
 
+
 				for (int k = 0; k < 36; k++) {
 					if (pixel->h >= (10 * k) && (pixel->h < (10 * k + 10))) {
 						hist[x][y][k] = hist[x - 1][y][k] + hist[x][y - 1][k] - hist[x - 1][y - 1][k] + 1;
@@ -49,6 +50,7 @@ stats::stats(PNG & im) {
 				sumHueY[x][y] = sumHueY[x - 1][y] + sin((pixel->h) * PI / 180);
 				sumSat[x][y] = sumSat[x - 1][y] + pixel->s;
 				sumLum[x][y] = sumLum[x - 1][y] + pixel->l;
+
 				for (int k = 0; k < 36; k++) {
 					if (pixel->h >= (10 * k) && (pixel->h < (10 * k + 10))) {
 						hist[x][y][k] = hist[x - 1][y][k] + 1;
@@ -63,6 +65,7 @@ stats::stats(PNG & im) {
 				sumHueY[x][y] = sumHueY[x][y - 1] + sin((pixel->h) * PI / 180);
 				sumSat[x][y] = sumSat[x][y - 1] + pixel->s;
 				sumLum[x][y] = sumLum[x][y - 1] + pixel->l;
+				
 				for (int k = 0; k < 36; k++) {
 					if (pixel->h >= (10 * k) && (pixel->h < (10 * k + 10))) {
 						hist[x][y][k] = hist[x][y - 1][k] + 1;
@@ -73,11 +76,11 @@ stats::stats(PNG & im) {
 
 				}
 			} else {
-				sumHueX[x][y] = cos(pixel->h);
-				sumHueY[x][y] = sin(pixel->h);
+				sumHueX[x][y] = cos((pixel->h)*PI/180);
+				sumHueY[x][y] = sin((pixel->h)*PI/180);
 				sumSat[x][y] = pixel->s;
 				sumLum[x][y] = pixel->l;
-				cout << "sumlum4: "<<sumLum[x][y] << endl;
+				//cout << "sumlum4: "<<sumLum[x][y] << endl;
 				for (int k = 0; k < 36; k++) {
 					if (pixel->h >= (10 * k) && (pixel->h < (10 * k + 10))) {
 						hist[x][y][k]++;
@@ -158,6 +161,9 @@ HSLAPixel stats::getAvg(pair<int,int> ul, pair<int,int> lr){
 vector<int> stats::buildHist(pair<int,int> ul, pair<int,int> lr){
 
 /* your code here */
+	cout<<"build hist"<<endl;
+	cout<<"ul: "<< ul.first<<", "<<ul.second<<endl;
+	cout<<"lr: "<<lr.first<<", "<<lr.second<<endl;
 	vector<int> newHist(36);
 	for(int k=0; k<36; k++){
 		if(ul.first>0 && ul.second>0){
