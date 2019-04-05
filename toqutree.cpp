@@ -181,10 +181,14 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 	unsigned int J = 0;
 	PNG *subIm;
 	if(ul.first > lr.first && ul.second > lr.second ){
-		subIm = new PNG(im->width() - ul.first + lr.first, im->height()- ul.second + lr.second);
+		subIm = new PNG(im->width() - ul.first + lr.first +1, im->height()- ul.second + lr.second +1);
 
 		for (unsigned int i = ul.first; i<im->width(); i++){
 			for(unsigned int j = ul.second; j<im->height();j++){
+				cout<<"png1 I: "<<I<<endl;
+				cout<<"png1 J: "<<J<<endl;
+				cout<<"png1 i: "<<i<<endl;
+				cout<<"png1 j: "<<j<<endl;                                                                                                                                     
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -228,7 +232,7 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 
 	}
 	else if(ul.first > lr.first){
-		subIm = new PNG(im->width() - ul.first + lr.first, ul.second - lr.second);
+		subIm = new PNG(im->width() - ul.first + lr.first +1, lr.second - ul.second +1);
 		for(unsigned int i = ul.first; i<im->width(); i++){
 			for(unsigned int j = ul.second; j<=lr.second; j++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
@@ -249,7 +253,7 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 
 	}
 	else if(ul.second > lr.second){
-		subIm = new PNG(ul.first - lr.first, im->height()- ul.second + lr.second);
+		subIm = new PNG(lr.first - ul.first + 1, im->height()- ul.second + lr.second+1);
 		for(unsigned int j = ul.second; j<im->height(); j++){
 			for (unsigned int i = ul.first; i<=lr.first; i++){
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
@@ -297,6 +301,8 @@ PNG toqutree::render(Node* subRoot, PNG & image){
 	if(subRoot->NW == NULL){
 		unsigned int x = subRoot->center.first;
 		unsigned int y = subRoot->center.second;
+		cout<<"render x: "<<x<<endl;
+		cout<<"render y: "<<y<<endl;
 		HSLAPixel* pixel = image.getPixel(x,y);
 		*pixel = subRoot->avg;
 		return image;
