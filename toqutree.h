@@ -55,7 +55,7 @@ private:
       Node * SW; // left bottom child 
       
    };
-	
+  
    
 public:
 
@@ -193,7 +193,7 @@ private:
 
    double calEntropy(PNG *im, pair<int,int> ul, pair<int,int> lr);
 
-   PNG render(Node* subRoot, PNG & image);
+   PNG render(Node* subRoot, PNG & image, pair<int,int> ul);
 
    void prune(Node* subRoot, double tol);
 

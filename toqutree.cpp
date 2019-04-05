@@ -61,8 +61,8 @@ int toqutree::size(Node* subRoot){
 
 toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 
-	cout<<"enter buildtree"<<endl;
-	cout<<"k: "<<k<<endl;
+	//cout<<"enter buildtree"<<endl;
+	//cout<<"k: "<<k<<endl;
 
 	stats a = stats(*im);
 	if(k > 1) {
@@ -156,6 +156,7 @@ toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 				ul.second = lr.second+1;
 				lr.first = x-1;
 				lr.second = pow(2,k-1) - (im->height()-y) -1;
+				sum+=a.entropy(ul, lr);
 			}
 
 			else{
@@ -199,36 +200,132 @@ toqutree::Node * toqutree::buildTree(PNG * im, int k) {
 		}
 	}
 
-	cout<<"get center"<<endl;
+	//cout<<"get center"<<endl;
 	Node * mainNode = new Node(center,k,avg);
 
-	ul.first = center.first;
-	ul.second = center.second;
-	lr.first = center.first + pow(2,k - 1)-1;
-	lr.second = center.second + pow(2,k - 1)-1;
-	mainNode->SE = buildTree(buildPNG(im, ul, lr),k-1);
-	ul.first = lr.first + 1;
-	ul.second = lr.second + 1;
-	lr.first = center.first - 1;
-	lr.second = center.second - 1;
-	mainNode->NW = buildTree(buildPNG(im, ul, lr),k-1);
-	ul.first = center.first + pow(2,k-1);
-	ul.second = center.second;
-	lr.first = center.first - 1;
-	lr.second = center.second + pow(2,k-1)-1;
-	mainNode->SW = buildTree(buildPNG(im, ul, lr),k-1);
-	ul.first = center.first;
-	ul.second = center.second + pow(2,k-1);
-	lr.first = center.first + pow(2,k-1)-1;
-	lr.second = center.second - 1;
-	mainNode->NE = buildTree(buildPNG(im, ul, lr),k-1);
+	if(center.first+pow(2,k-1) > im->width() && center.second + pow(2,k-1) > im->height()){
+		ul.first = center.first;
+		ul.second = center.second;
+		lr.first = pow(2,k-1) - (im->width()-center.first) -1;
+		lr.second = pow(2,k-1) - (im->height()-center.second) -1;
+		mainNode->SE = buildTree(buildPNG(im,  ul, lr), k-1);
+
+		ul.first = lr.first+1;
+		ul.second = lr.second+1;
+		lr.first = center.first-1;
+		lr.second = center.second-1;
+		mainNode->NW = buildTree(buildPNG(im, ul, lr), k-1);
+
+		ul.first = center.first - pow(2,k-1);
+		ul.second = center.second;
+		lr.first = center.first -1;
+		lr.second = pow(2,k-1) - (im->height()-center.second) -1;
+		mainNode->SW = buildTree(buildPNG(im, ul, lr), k-1);
+
+		ul.first = center.first;
+		ul.second = lr.second+1;
+		lr.first = pow(2,k-1) - (im->width()-center.first) -1;
+		lr.second = center.second -1;
+		mainNode->NE = buildTree(buildPNG(im, ul, lr), k-1);
+		
+	}
+
+	else if(center.first+pow(2,k-1) > im->width()){
+		ul.first = center.first; 
+		ul.second = center.second;
+		lr.first = pow(2,k-1) - (im->width()-center.first) -1;
+		lr.second = center.second + pow(2, k-1)-1;
+		mainNode->SE = buildTree(buildPNG(im, ul, lr), k-1);
+
+		ul.first = lr.first +1;
+		ul.second = center.second;
+		lr.first = center.first -1;
+		lr.second = center.second + pow(2, k-1)-1;
+		mainNode->NW = buildTree(buildPNG(im, ul, lr), k-1);
+
+		ul.first = center.first;
+		ul.second = lr.second +1;
+		lr.first = pow(2,k-1) - (im->width()-center.first) -1;
+		lr.second = center.second-1;
+		mainNode->NE = buildTree(buildPNG(im, ul, lr), k-1);
+
+		ul.first = center.first - pow(2,k-1);
+		ul.second = center.second + pow(2,k-1);
+		lr.first = center.first -1;
+		lr.second = center.second-1;
+		mainNode->SW = buildTree(buildPNG(im, ul, lr), k-1);
+	}
+
+	else if(center.second+pow(2,k-1) > im->height()){
+		ul.first = center.first;
+		ul.second = center.second;
+		lr.first = center.first + pow(2, k-1)-1;
+		lr.second = pow(2,k-1) - (im->height()-center.second) -1;
+		mainNode->SE = buildTree(buildPNG(im, ul, lr), k-1);
+
+		ul.first = lr.first +1;
+		ul.second = lr.second +1;
+		lr.first = center.first-1;
+		lr.second = center.second-1;
+		mainNode->NW = buildTree(buildPNG(im, ul, lr), k-1);
+
+		ul.first =center.first;
+		ul.second = center.second -pow(2, k-1);
+		lr.first = center.first +pow(2, k-1)-1;
+		lr.second = center.second-1;
+		mainNode->NE = buildTree(buildPNG(im, ul, lr), k-1);
+
+		ul.first = lr.first+1;
+		ul.second = lr.second+1;
+		lr.first = center.first-1;
+		lr.second = pow(2,k-1) - (im->height()-center.second) -1;
+		mainNode->SW = buildTree(buildPNG(im, ul, lr), k-1);
+	}
+
+	else{
+		ul.first = center.first;
+		ul.second = center.second;
+		lr.first = center.first + pow(2,k - 1)-1;
+		lr.second = center.second + pow(2,k - 1)-1;
+		mainNode->SE = buildTree(buildPNG(im, ul, lr),k-1);
+
+		ul.first = lr.first + 1;
+		ul.second = lr.second + 1;
+		lr.first = center.first - 1;
+		lr.second = center.second - 1;
+		mainNode->NW = buildTree(buildPNG(im, ul, lr),k-1);
+		
+		ul.first = center.first + pow(2,k-1);
+		ul.second = center.second;
+		lr.first = center.first - 1;
+		lr.second = center.second + pow(2,k-1)-1;
+		mainNode->SW = buildTree(buildPNG(im, ul, lr),k-1);
+		
+		ul.first = center.first;
+		ul.second = center.second + pow(2,k-1);
+		lr.first = center.first + pow(2,k-1)-1;
+		lr.second = center.second - 1;
+		mainNode->NE = buildTree(buildPNG(im, ul, lr),k-1);
+		//cout<<"end 1"<<endl;
+	}
+	delete(im);
 	return mainNode;
 }
 else if (k == 1){
         pair<int,int> center (1,1);
-	pair<int,int> ul(0,0);
+		pair<int,int> ul(0,0);
         HSLAPixel avg = a.getAvg(ul,center);
         Node * mainNode = new Node(center,k,avg);
+        mainNode->SE = buildTree(buildPNG(im,center,center), k-1);
+        mainNode->NW = buildTree(buildPNG(im,ul,ul), k-1);
+        ul.first = 0;
+        ul.second = 1;
+        mainNode->SW = buildTree(buildPNG(im,ul,ul), k-1);
+        ul.first = 1;
+        ul.second = 0;
+        mainNode->NE = buildTree(buildPNG(im,ul,ul), k-1);
+        //cout<<"end 2"<<endl;
+        delete(im);
         return mainNode;
     }
 
@@ -236,8 +333,10 @@ else{
 	pair<int,int> center (0,0);
 	HSLAPixel avg = a.getAvg(center,center);
 	Node * mainNode = new Node(center,k,avg);
+	//cout<<"end 3"<<endl;
+	delete(im);
 	return mainNode;
-}
+} 
 
 // Note that you will want to practice careful memory use
 // In this function. We pass the dynamically allocated image
@@ -280,7 +379,9 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		subIm = new PNG(im->width() - ul.first + lr.first +1, im->height()- ul.second + lr.second +1);
 
 		for (unsigned int i = ul.first; i<im->width(); i++){
-			for(unsigned int j = ul.second; j<im->height();j++){                                                                                                               
+			for(unsigned int j = ul.second; j<im->height();j++){
+				//cout<<"1 I: "<<I<<endl;
+				//cout<<"1 J: "<<J<<endl;                                                                                                               
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -292,6 +393,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		int temp = 0;
 		for (unsigned int i = 0; i<=lr.first; i++){
 			for(unsigned int j = ul.second; j<im->height();j++){
+				//cout<<"2 I: "<<I<<endl;
+				//cout<<"2 J: "<<J<<endl; 
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -304,6 +407,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		J = temp;
 		for (unsigned int i = ul.first; i<im->width(); i++){
 			for(unsigned int j = 0; j<=lr.second; j++){
+				//cout<<"3 I: "<<I<<endl;
+				//cout<<"3 J: "<<J<<endl; 
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -314,6 +419,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		J = temp;
 		for(unsigned int i = 0; i<= lr.first; i++){
 			for(unsigned int j = 0; j<=lr.second; j++){
+				//cout<<"4 I: "<<I<<endl;
+				//cout<<"4 J: "<<J<<endl; 
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -327,6 +434,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		subIm = new PNG(im->width() - ul.first + lr.first +1, lr.second - ul.second +1);
 		for(unsigned int i = ul.first; i<im->width(); i++){
 			for(unsigned int j = ul.second; j<=lr.second; j++){
+				//cout<<"5 I: "<<I<<endl;
+				//cout<<"5 J: "<<J<<endl; 
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -336,6 +445,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 
 		for(unsigned int i = 0; i<= lr.first; i++){
 			for(unsigned int j = ul.second; j<=lr.second; j++){
+				//cout<<"6 I: "<<I<<endl;
+				//cout<<"6 J: "<<J<<endl; 
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -348,6 +459,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		subIm = new PNG(lr.first - ul.first + 1, im->height()- ul.second + lr.second+1);
 		for(unsigned int j = ul.second; j<im->height(); j++){
 			for (unsigned int i = ul.first; i<=lr.first; i++){
+				//cout<<"7 I: "<<I<<endl;
+				//cout<<"7 J: "<<J<<endl; 
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				I++;
 			}
@@ -356,6 +469,8 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		}
 		for(unsigned int j = 0; j<=lr.second; j++){
 			for(unsigned int i = ul.first; i <= lr.first; i++){
+				//cout<<"8 I: "<<I<<endl;
+				//cout<<"8 J: "<<J<<endl; 
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				I++;
 			}
@@ -368,6 +483,11 @@ cs221util::PNG* toqutree::buildPNG(PNG *im, pair<unsigned int,unsigned int> ul, 
 		subIm = new PNG(lr.first - ul.first + 1, lr.second - ul.second + 1);
 		for (unsigned int i = ul.first; i < lr.first + 1; i++) {
 			for (unsigned int j = ul.second; j < lr.second + 1; j++) {
+				//cout<<"9 I: "<<I<<endl;
+				//cout<<"9 J: "<<J<<endl; 
+				//cout<<"9 i: "<<i<<endl;
+				//cout<<"9 j: "<<j<<endl;
+				//cout<<"9 lr second"<< lr.second<<endl;
 				*subIm->getPixel(I, J) = *im->getPixel(i, j);
 				J++;
 			}
@@ -386,25 +506,132 @@ PNG toqutree::render(){
 // quadtree, instead.
 
 /* your code here */
+	pair<int, int> ul;
+	ul.first = 0;
+	ul.second = 0;
 	PNG *image = new PNG(pow(2,root->dimension), pow(2,root->dimension));
-	return render(root, *image);
+	return render(root, *image, ul);
 }
 
-PNG toqutree::render(Node* subRoot, PNG & image){
+PNG toqutree::render(Node* subRoot, PNG & image, pair<int,int> ul){
 	if(subRoot->NW == NULL){
-		unsigned int x = subRoot->center.first;
-		unsigned int y = subRoot->center.second;
-		cout<<"render x: "<<x<<endl;
-		cout<<"render y: "<<y<<endl;
-		HSLAPixel* pixel = image.getPixel(x,y);
-		*pixel = subRoot->avg;
+		unsigned int x = ul.first;
+		unsigned int y = ul.second;
+		//cout<<"render x: "<<x<<endl;
+		//cout<<"render y: "<<y<<endl;
+		if(x>510 || y>510){
+			cout<<"render x: "<<x<<endl;
+			cout<<"render y: "<<y<<endl;
+		}
+		*image.getPixel(x,y) = subRoot->avg;
+/*		HSLAPixel* pixel = image.getPixel(x,y);
+		//delete(pixel);
+		*pixel = subRoot->avg;*/
 		return image;
 	}
 	else{
-		render(subRoot->NW, image);
-		render(subRoot->NE, image);
-		render(subRoot->SE, image);
-		render(subRoot->SW, image);
+
+		if(subRoot->center.first - pow(2,subRoot->dimension-1) >= 0 && subRoot->center.second - pow(2,subRoot->dimension-1) >= 0){
+			cout<<"1"<<endl;
+
+			pair<int,int> nw;
+			nw.first = ul.first + subRoot->center.first - pow(2,subRoot->dimension-1);
+			nw.second = ul.second + subRoot->center.second - pow(2,subRoot->dimension-1);
+
+			pair<int,int> ne;
+			ne.first = ul.first + subRoot->center.first;
+			ne.second = ul.second + subRoot->center.second - pow(2,subRoot->dimension-1);
+
+			pair<int, int> sw;
+			sw.first = ul.first + subRoot->center.first - pow(2,subRoot->dimension-1);
+			sw.second = ul.second + subRoot->center.second;
+
+			pair<int, int> se;
+			se.first = ul.first + subRoot->center.first;
+			se.second = ul.second + subRoot->center.second;
+
+			render(subRoot->SE, image, se);
+			render(subRoot->NW, image, nw);
+			render(subRoot->NE, image, ne);
+			render(subRoot->SW, image, sw);
+
+		}
+
+		else if(subRoot->center.first - pow(2,subRoot->dimension-1) >= 0){
+			cout<<"2"<<endl;
+
+			pair<int, int> nw;
+			nw.first = ul.first + subRoot->center.first - pow(2,subRoot->dimension-1);
+			nw.second = ul.second + subRoot->center.second + pow(2, subRoot->dimension-1);
+
+			pair<int, int> ne;
+			ne.first = ul.first + subRoot->center.first;
+			ne.second = ul.second+ subRoot->center.second + pow(2, subRoot->dimension-1);
+
+			pair<int, int> sw;
+			sw.first = ul.first + subRoot->center.first - pow(2, subRoot->dimension-1);
+			sw.second = ul.second + subRoot->center.second;
+
+			pair<int, int> se;
+			se.first = ul.first + subRoot->center.first;
+			se.second = ul.second + subRoot->center.second;
+
+			render(subRoot->SE, image, se);
+			render(subRoot->NW, image, nw);
+			render(subRoot->NE, image, ne);
+			render(subRoot->SW, image, sw);			
+
+		}
+
+		else if(subRoot->center.second - pow(2,subRoot->dimension-1) >= 0){
+			cout<<"3"<<endl;
+
+			pair<int, int> nw;
+			nw.first = ul.first + subRoot->center.first + pow(2,subRoot->dimension-1);
+			nw.second = ul.second + subRoot->center.second - pow(2, subRoot->dimension-1);
+
+			pair<int, int> ne;
+			ne.first = ul.first + subRoot->center.first;
+			ne.second = ul.second + subRoot->center.second - pow(2, subRoot->dimension-1);
+
+			pair<int, int> sw;
+			sw.first = ul.first + subRoot->center.first + pow(2, subRoot->dimension-1);
+			sw.second = ul.second + subRoot->center.second;
+
+			pair<int, int> se;
+			se.first = ul.first + subRoot->center.first;
+			se.second = ul.second + subRoot->center.second;
+
+			render(subRoot->SE, image, se);
+			render(subRoot->NW, image, nw);
+			render(subRoot->NE, image, ne);
+			render(subRoot->SW, image, sw);		
+		}
+
+		else{
+
+			cout<<"4"<<endl;
+			pair<int, int> nw;
+			nw.first = ul.first + subRoot->center.first + pow(2,subRoot->dimension-1);
+			nw.second = ul.second + subRoot->center.second + pow(2, subRoot->dimension-1);
+
+			pair<int, int> ne;
+			ne.first = ul.first + subRoot->center.first;
+			ne.second = ul.second + subRoot->center.second + pow(2, subRoot->dimension-1);
+
+			pair<int, int> sw;
+			sw.first = ul.first + subRoot->center.first + pow(2, subRoot->dimension-1);
+			sw.second = ul.second + subRoot->center.second;
+
+			pair<int, int> se;
+			se.first = ul.first + subRoot->center.first;
+			se.second = ul.second + subRoot->center.second;
+
+			render(subRoot->SE, image, se);
+			render(subRoot->NW, image, nw);
+			render(subRoot->NE, image, ne);
+			render(subRoot->SW, image, sw);		
+		}
 
 		return image;
 	}
@@ -463,9 +690,13 @@ toqutree::Node * toqutree::copy(const Node * other) {
 
 /* your code here */
 	Node *newRoot = new Node(other->center, other->dimension, other->avg);
-	if(other!=NULL){
-		copy(newRoot, other);
+	if(other->NW != NULL){
+		copy(newRoot->NW, other->NW);
+		copy(newRoot->NE, other->NE);
+		copy(newRoot->SW, other->SW);
+		copy(newRoot->SE, other->SE);
 	}
+
 	return newRoot;
 }
 
@@ -473,11 +704,7 @@ void toqutree::copy(Node *& subRoot, const Node* other){
 	if(other->NW==NULL){
 		Node * newNode = new Node(other->center, other->dimension, other->avg);
 		subRoot = newNode;
-		newNode = NULL;
-		subRoot->NW = NULL;
-		subRoot->NE = NULL;
-		subRoot->SW = NULL;
-		subRoot->SE = NULL;
+		
 	}
 	else{
 		Node * newNode = new Node(other->center, other->dimension, other->avg);
